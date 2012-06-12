@@ -1,0 +1,14 @@
+Requirements
+------------
+
+# on Ubuntu 12.04 we only need boto
+$ apt-get install python-pip python-dev
+$ pip install --upgrade pip
+$ pip install --upgrade virtualenv
+$ pip install --upgrade boto
+
+# this is all it takes to backup all non-root volumes
+$ mkdir -p 9apps/tools && cd 9apps/tools
+$ git clone https://github.com/truthtrap/backups
+$ cd backups
+$ python backup.py setup

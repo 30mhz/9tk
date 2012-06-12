@@ -1,0 +1,25 @@
+Usage:
+	 backup.py <cmd> <expiration>
+
+<cmd>: snapshot or purge
+<expiration>: hourly (default), daily, weekly, monthly
+
+This command expects userdata with at least the following values
+{
+    "access_key_id" : "",
+    "secret_access_key" : "",
+    "backups" : {
+      "domain" : "snapshots.9apps.net",
+      "schedule" : ["hourly", "daily", "weekly", "monthly"],
+      "expiration" : [1, 7, 28, 365],
+      "hourly" : "15 */2 * * *",
+      "daily" : "@daily",
+      "weekly" : "@weekly",
+      "monthly" : "@monthly"
+    }
+}
+
+Most of these are necessary, but "schedule", "expiration", "hourly", "daily", "weekly", "monthly" have sensible defaults. They are shown to illustrate they can be overwritten.
+
+Requirements: python + boto and proper credentials, of course.
+    All devices to be snapshotted should be XFS.
