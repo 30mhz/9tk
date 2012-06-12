@@ -1,7 +1,8 @@
 Requirements
 ------------
 
-# on Ubuntu 12.04 we only need boto
+# on Ubuntu 12.04 we need git and boto
+$ apt-get install git
 $ apt-get install python-pip python-dev
 $ pip install --upgrade pip
 $ pip install --upgrade virtualenv
