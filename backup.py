@@ -70,22 +70,22 @@ class Backup:
 			f = open("/etc/cron.d/9apps-backup", "w")
 
 			if 'hourly' not in self.config:
-				hourly = "15 */3 * * *"
+				hourly = "0 * * * *"
 			else:
 				hourly = self.config['hourly']
 
 			if 'daily' not in self.config:
-				daily = "@daily"
+				daily = "0 0 * * *"
 			else:
 				daily = self.config['daily']
 
 			if 'weekly' not in self.config:
-				weekly = "@weekly"
+				weekly = "0 0 * * 0"
 			else:
 				weekly = self.config['weekly']
 
 			if 'monthly' not in self.config:
-				monthly = "@monthly"
+				monthly = "0 0 1 * *"
 			else:
 				monthly = self.config['monthly']
 
@@ -93,11 +93,11 @@ class Backup:
 			f.write("# script. (see github.com/9apps for details.)\n")
 			f.write("#\n")
 			f.write("# generated with 'python backup.py setup'\n")
-			f.write("{0} {1} all hourly > /dev/null 2>&1\n".format(hourly, cmd))
-			f.write("{0} {1} all daily > /dev/null 2>&1\n".format(daily, cmd))
-			f.write("{0} {1} all weekly > /dev/null 2>&1\n".format(weekly, cmd))
-			f.write("{0} {1} all monthly > /dev/null 2>&1\n".format(monthly, cmd))
-			f.write("{0} {1} purge \"`date +\"%Y-%m-%d %H:%M:%S\"`\" > /dev/null 2>&1\n".format(monthly, cmd))
+			f.write("{0} root {1} all hourly > /dev/null 2>&1\n".format(hourly, cmd))
+			f.write("{0} root {1} all daily > /dev/null 2>&1\n".format(daily, cmd))
+			f.write("{0} root {1} all weekly > /dev/null 2>&1\n".format(weekly, cmd))
+			f.write("{0} root {1} all monthly > /dev/null 2>&1\n".format(monthly, cmd))
+			f.write("{0} root {1} purge \"`date +\"%Y-%m-%d %H:%M:%S\"`\" > /dev/null 2>&1\n".format(monthly, cmd))
 		finally:
 			f.close()
 
