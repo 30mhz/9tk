@@ -97,7 +97,7 @@ class Backup:
 			f.write("{0} root {1} all daily > /dev/null 2>&1\n".format(daily, cmd))
 			f.write("{0} root {1} all weekly > /dev/null 2>&1\n".format(weekly, cmd))
 			f.write("{0} root {1} all monthly > /dev/null 2>&1\n".format(monthly, cmd))
-			f.write("{0} root {1} purge \"`date +\"%Y-%m-%d %H:%M:%S\"`\"> /dev/null 2>&1\n".format(monthly, cmd))
+			f.write("{0} root {1} purge > /dev/null 2>&1\n".format(monthly, cmd))
 		finally:
 			f.close()
 
@@ -154,18 +154,18 @@ class Backup:
 		snapshots = self.ec2.get_all_snapshots(filters=params)
 
 		expired = []
-		if expiration != 'none':
-			for snapshot in snapshots:
-				if snapshot.tags['Expires'] < expiration:
-					expired.append(snapshot)
+		for snapshot in snapshots:
+			if snapshot.tags['Expires'] < expiration:
+				expired.append(snapshot)
 
 		return expired
 
 	def _delete(self, snapshot):
 		self.ec2.delete_snapshot(snapshot)
 
-	# purges past their expiration date, or 'all' (by default it does nothing)
-	def purge(self, expiration = 'none'):
+	# purges past their expiration date, or 'all'
+	def purge(self, expiration = strftime("%Y-%m-%d %H:%M:%S", gmtime(time()))):
+
 		snapshots = self._get_snapshots(expiration)
 		for snapshot in snapshots:
 			print "deleting snapshot {0}".format(snapshot.id)
