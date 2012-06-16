@@ -97,7 +97,7 @@ class Backup:
 			f.write("{0} root {1} all daily > /dev/null 2>&1\n".format(daily, cmd))
 			f.write("{0} root {1} all weekly > /dev/null 2>&1\n".format(weekly, cmd))
 			f.write("{0} root {1} all monthly > /dev/null 2>&1\n".format(monthly, cmd))
-			f.write("{0} root {1} purge > /dev/null 2>&1\n".format(monthly, cmd))
+			f.write("{0} root {1} purge \"`date +\"%Y-%m-%d %H:%M:%S\"`\"> /dev/null 2>&1\n".format(monthly, cmd))
 		finally:
 			f.close()
 
@@ -151,7 +151,15 @@ class Backup:
 
 	def _get_snapshots(self, expiration = 'none'):
 		params = { "tag:Name" : self.name }
-		return self.ec2.get_all_snapshots(filters=params)
+		snapshots = self.ec2.get_all_snapshots(filters=params)
+
+		expired = []
+		if expiration != 'none':
+			for snapshot in snapshots:
+				if snapshot.tags['Expires'] < expiration:
+					expired.append(snapshot)
+
+		return expired
 
 	def _delete(self, snapshot):
 		self.ec2.delete_snapshot(snapshot)
@@ -160,9 +168,8 @@ class Backup:
 	def purge(self, expiration = 'none'):
 		snapshots = self._get_snapshots(expiration)
 		for snapshot in snapshots:
-			if snapshot.tags['Expires'] < expiration:
-				print "deleting snapshot {0}".format(snapshot.id)
-				self._delete(snapshot.id)
+			print "deleting snapshot {0}".format(snapshot.id)
+			self._delete(snapshot.id)
 
 if __name__ == '__main__':
 	userdata = json.load(urlopen("http://169.254.169.254/latest/user-data/"))
