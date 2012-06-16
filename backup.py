@@ -97,7 +97,7 @@ class Backup:
 			f.write("{0} root {1} all daily > /dev/null 2>&1\n".format(daily, cmd))
 			f.write("{0} root {1} all weekly > /dev/null 2>&1\n".format(weekly, cmd))
 			f.write("{0} root {1} all monthly > /dev/null 2>&1\n".format(monthly, cmd))
-			f.write("{0} root {1} purge \"`date +\"%Y-%m-%d %H:%M:%S\"`\" > /dev/null 2>&1\n".format(monthly, cmd))
+			f.write("{0} root {1} purge > /dev/null 2>&1\n".format(monthly, cmd))
 		finally:
 			f.close()
 
