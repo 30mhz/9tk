@@ -16,7 +16,7 @@
 # along with 9apps ToolKit. If not, see <http://www.gnu.org/licenses/>.
 
 import sys
-
+import subprocess
 from subprocess import Popen
 
 def main(argv):
@@ -67,8 +67,15 @@ class Mountpoint:
         mp = self.mountpoint
         print("Mounting {0} @ {1} ...".format(d, mp))
 
-        Popen(["mkdir", mp])
-        Popen(["mount", "-t", "xfs", "-o", "defaults", d, mp])
+        Popen(["mkdir", mp], stdout=subprocess.PIPE).wait()
+        Popen(["mount", "-t", "xfs", "-o", "defaults", d, mp], stdout=subprocess.PIPE).wait()
+
+        #cmd = ['/run/myscript', '--arg', 'value']
+        #p = subProcess.Popen(cmd, stdout=subprocess.PIPE)
+        #for line in p.stdout:
+        #    print line
+        #p.wait()
+        #print p.returncode
 
 
     def unmount(self):
@@ -76,7 +83,7 @@ class Mountpoint:
         mp = self.mountpoint
         print("Umounting {0} ...".format(mp))
 
-        Popen(["umount", "-t", "xfs", mp])
+        Popen(["umount", "-t", "xfs", mp], stdout=subprocess.PIPE).wait()
 
 
 
