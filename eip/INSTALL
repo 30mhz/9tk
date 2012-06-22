@@ -1,0 +1,5 @@
+Add script ec2_init.py to /root
+Add script ec2 (in github) to /etc/init.d and change EIP accordingly.
+
+$ chmod 700 /etc/init.d/ec2
+$ update-rc.d ec2 defaults
