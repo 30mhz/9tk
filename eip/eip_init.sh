@@ -13,8 +13,8 @@ SCRIPT_DIR=/root
 ELASTIC_IP=79.125.7.52
 
 associate_ip() {
-    local ACTION
-    python ${SCRIPT_DIR}/eip_init.py ${ELASTIC_IP} $ACTION
+    local ACTION=$1
+    python ${SCRIPT_DIR}/eip.py ${ELASTIC_IP} $ACTION
 }
 
 start() {

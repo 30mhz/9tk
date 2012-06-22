@@ -27,7 +27,6 @@ from boto.ec2.regioninfo import RegionInfo
 
 try:
     url = "http://169.254.169.254/latest/"
-    #userdata = json.load(urllib2.urlopen(url + "user-data"))
     instance_id = urllib2.urlopen(url + "meta-data/instance-id").read()
     region = urllib2.urlopen(url + "meta-data/placement/availability-zone").read()[:-1]
 except Exception as e:
