@@ -9,7 +9,7 @@ until(new IO::Socket::INET("169.254.169.254:80")){print"Waiting for network...\n
 ' | $logger
 
 
-SCRIPT_DIR=/root
+SCRIPT_DIR=/root/9tk/eip
 ELASTIC_IP=79.125.7.52
 
 associate_ip() {

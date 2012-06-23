@@ -37,7 +37,6 @@ if __name__ == '__main__':
     region_info = RegionInfo(name=region, endpoint="ec2.{0}.amazonaws.com".format(region))
     # we use IAM EC2 role to get the credentials transparently
     ec2 = EC2Connection(region=region_info)
-
     address = ec2.get_all_addresses(sys.argv[1])[0]
 
 if sys.argv[2] == "start":

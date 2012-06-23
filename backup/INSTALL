@@ -3,7 +3,7 @@ Requirements
 
 On Ubuntu 12.04 we need git and boto:
 $ apt-get install git
-$ apt-get install python-pip python-dev
+$ apt-get install python-dev python-pip
 $ pip install --upgrade pip
 
 If doesn't work logout and sudo again:
@@ -11,7 +11,6 @@ $ pip install --upgrade virtualenv
 $ pip install --upgrade boto
 
 This is all it takes to backup all non-root volumes:
-$ mkdir -p 9apps/tools && cd 9apps/tools
-$ git clone git@github.com:9apps/backups.git
-$ cd backups
-$ python backup/backup.py setup
+$ cd /root
+$ git clone git@github.com:9apps/9tk.git && cd 9tk/backups
+$ python backup.py setup

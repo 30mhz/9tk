@@ -79,7 +79,7 @@ class Mountpoint:
 
 
     def unmount(self):
-        """Umount the device to a specific location"""
+        """Umount the specific location"""
         mp = self.mountpoint
         print("Umounting {0} ...".format(mp))
 
