@@ -45,7 +45,7 @@ class EIP:
         try:
             if eip.instance_id == "":
                 # TODO
-                if config.NOOP:
+                if self.config.NOOP:
                     result = True
                 else:
                     result = eip.associate(instanceId)
@@ -77,7 +77,7 @@ class EIP:
                     associated_instance_id)
             else:
                 # TODO
-                if config.NOOP:
+                if self.config.NOOP:
                     result = True
                 else:
                     # the EIP is associated to this instance, disassociate it
