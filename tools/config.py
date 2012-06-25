@@ -16,7 +16,7 @@ class Config:
         self.NOOP = True
 
     def __repr__(self):
-        return 'InstanceId: {0}, {1}, {2}'.format(self.instanceId, self.regionInfo, json.dumps(self.userData, indent=4))
+        return 'InstanceId: {0}\n{1}\nUserData: {2}'.format(self.instanceId, self.regionInfo, json.dumps(self.userData, indent=4))
 
     @classmethod
     def fromFile(cls, filename):

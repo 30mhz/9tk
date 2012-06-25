@@ -27,7 +27,7 @@ class EIP:
         try:
             # we use IAM EC2 role to get the credentials transparently
             ec2 = EC2Connection(region=config.regionInfo)
-            ip = config.data['eip']['ip']
+            ip = config.userData['eip']['ip']
             eip = ec2.get_all_addresses([ip])[0]
             print "Elastic IP: {0}".format(eip)
 
