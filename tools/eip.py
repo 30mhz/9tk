@@ -36,8 +36,12 @@ class EIP:
             instanceId = urllib2.urlopen(url + "meta-data/instance-id").read()
             region = urllib2.urlopen(url + "meta-data/placement/availability-zone").read()
             region_info = RegionInfo(name=region, endpoint="ec2.{0}.amazonaws.com".format(region))
-            # we use IAM EC2 role to get the credentials transparently
-            ec2 = EC2Connection(region=region_info)
+
+            # TODO we use IAM EC2 role to get the credentials transparently
+
+            key = userdata['access_key_id']
+            access = userdata['secret_access_key']
+            ec2 = EC2Connection(key, access, region=region_info)
             eip = ec2.get_all_addresses(config.data['eip']['ip'])[0]
             return cls(instanceId, eip)
         except Exception as e:

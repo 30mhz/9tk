@@ -6,13 +6,16 @@ from tools.eip import EIP
 class ToolKit(cmd.Cmd):
     """Simple command processor example."""
 
+    def help_display(self):
+        print '\n'.join(["display", " Display user-data associated with this EC2 instance"])
+
     def do_display(self, line):
         config = Config.fromAmazon()
         print config.data
 
     ###############
 
-    EIP_COMMANDS = ["associate", "disassociate"]
+    EIP_COMMANDS = ["associate", "disassociate", "install", "uninstall"]
 
     def help_eip(self):
         print '\n'.join(["eip {0}".format(self.EIP_COMMANDS), " Associate or disassociate EIP configured in user-data"])
@@ -37,43 +40,17 @@ class ToolKit(cmd.Cmd):
 
     ###############
 
-    # backup setup (or install)
-
     # eip associate, dissociate, install, uninstall
-
+    # backup setup (or install)
     # mount -, install, uninstall
-
     # umount
 
-    def do_greet(self, person):
-        if person:
-            print "hi,", person
-        else:
-            print 'hi'
 
-    def help_greet(self):
-        print '\n'.join(['greet [person]', ' Greet the named person'])
-
-    FRIENDS = [ 'Alice', 'Adam', 'Barbara', 'Bob' ]
-
-    def complete_greet(self, text, line, begidx, endidx):
-        if not text:
-            completions = self.FRIENDS[:]
-        else:
-            completions = [ f
-                            for f in self.FRIENDS
-                            if f.startswith(text)
-                            ]
-        return completions
 
 
     def do_EOF(self, line):
         print "Exit"
         return True
-
-
-    def postloop(self):
-        print
 
 if __name__ == '__main__':
     ToolKit().cmdloop("\nWelcome to the 9apps ToolKit CLI.\n")
