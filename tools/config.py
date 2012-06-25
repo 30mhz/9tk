@@ -1,4 +1,5 @@
-import urllib2
+from urllib2 import urlopen
+import json
 
 class Config:
 
@@ -6,6 +7,8 @@ class Config:
         """Initialize Config"""
         self.data = config
 
+    def __repr__(self):
+        return json.dumps(self.data, sort_keys=True, indent=4)
 
     @classmethod
     def fromFile(cls, filename):
@@ -18,7 +21,7 @@ class Config:
         """Load user-data from aws"""
         try:
             url = "http://169.254.169.254/latest/"
-            data = urllib2.urlopen(url + "user-data").read()
+            data = json.load(urlopen(url + "user-data/"))
             return cls(data)
         except Exception as e:
             print e

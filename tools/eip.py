@@ -15,7 +15,9 @@
 # You should have received a copy of the GNU General Public License
 # along with 9apps ToolKit. If not, see <http://www.gnu.org/licenses/>.
 
-import  urllib2
+import traceback
+
+from urllib2 import urlopen
 
 from boto.ec2.connection import EC2Connection
 from boto.ec2.regioninfo import RegionInfo
@@ -33,20 +35,27 @@ class EIP:
     def fromAmazon(cls, config):
         url = "http://169.254.169.254/latest/"
         try:
-            instanceId = urllib2.urlopen(url + "meta-data/instance-id").read()
-            region = urllib2.urlopen(url + "meta-data/placement/availability-zone").read()
-            region_info = RegionInfo(name=region, endpoint="ec2.{0}.amazonaws.com".format(region))
+            instanceId = urlopen(url + "meta-data/instance-id").read()
+            region = urlopen(url + "meta-data/placement/availability-zone").read()[:-1]
+            endpoint = "ec2.{0}.amazonaws.com".format(region)
+            region_info = RegionInfo(name=region, endpoint=endpoint)
 
             # TODO we use IAM EC2 role to get the credentials transparently
 
-            key = userdata['access_key_id']
-            access = userdata['secret_access_key']
+            key = config.data['access_key_id']
+            access = config.data['secret_access_key']
+            ip = config.data['eip']['ip']
+            print "key: '{0}', access: '{1}', ip: '{2}', region: '{3}'".format(key, access, ip, region_info.endpoint)
             ec2 = EC2Connection(key, access, region=region_info)
-            eip = ec2.get_all_addresses(config.data['eip']['ip'])[0]
+            #eip = ec2.get_all_addresses(ip)[0]
+            eip = ec2.get_all_addresses()[0]
+            print "address: {0}".format(eip)
             return cls(instanceId, eip)
         except Exception as e:
-            print e
-            exit("We couldn't get instance information.")
+            print("ERROR - We couldn't get instance information: {0}".format(e))
+        finally:
+            print traceback.format_exc()
+
 
 
     def associate(self):
