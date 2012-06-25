@@ -16,39 +16,24 @@
 # along with 9apps ToolKit. If not, see <http://www.gnu.org/licenses/>.
 
 import traceback
-
-from urllib2 import urlopen
+import sys
 
 from boto.ec2.connection import EC2Connection
-from boto.ec2.regioninfo import RegionInfo
+from config import Config
 
 class EIP:
-    def __init__(self, instanceId, eip):
-        self.instanceId = instanceId
-        self.eip = eip
-
-    @classmethod
-    def mock(cls, instanceId, eip):
-        return cls(instanceId, eip)
-
-    @classmethod
-    def fromAmazon(cls, config):
-        url = "http://169.254.169.254/latest/"
+    def __init__(self, config):
+        self.config = config
         try:
-            instanceId = urlopen(url + "meta-data/instance-id").read()
-            region = urlopen(url + "meta-data/placement/availability-zone").read()[:-1]
-            endpoint = "ec2.{0}.amazonaws.com".format(region)
-            region_info = RegionInfo(name=region, endpoint=endpoint)
-            print "Instance: {0} in Region: {1}".format(instanceId, region_info.endpoint)
-
             # we use IAM EC2 role to get the credentials transparently
-            ec2 = EC2Connection(region=region_info)
+            ec2 = EC2Connection(region=config.regionInfo)
             ip = config.data['eip']['ip']
             eip = ec2.get_all_addresses([ip])[0]
             print "Elastic IP: {0}".format(eip)
-            return cls(instanceId, eip)
+
+            self.eip = eip
         except Exception as e:
-            print("ERROR - We couldn't get instance information: {0}".format(e))
+            print("ERROR - Problem retrieving the desired EIP: {0}".format(e))
         finally:
             print traceback.format_exc()
 
@@ -56,10 +41,15 @@ class EIP:
     def associate(self):
         result = False
         eip = self.eip
-        instanceId = self.instanceId
+        instanceId = self.config.instanceId
         try:
             if eip.instance_id == "":
-                result = eip.associate(instanceId)
+                # TODO
+                if config.NOOP:
+                    result = True
+                else:
+                    result = eip.associate(instanceId)
+
                 if result:
                     print "{0} is now associated to instance {1}".format(eip, instanceId)
                 else:
@@ -77,7 +67,7 @@ class EIP:
     def disassociate(self):
         result = False
         eip = self.eip
-        instanceId = self.instanceId
+        instanceId = self.config.instanceId
         associated_instance_id = eip.instance_id
         try:
             if associated_instance_id == "":
@@ -86,8 +76,13 @@ class EIP:
                 print "WARN - {0} is associated to another instance {1} - doing nothing".format(eip,
                     associated_instance_id)
             else:
-                # the EIP is associated to this instance, disassociate it
-                result = eip.disassociate()
+                # TODO
+                if config.NOOP:
+                    result = True
+                else:
+                    # the EIP is associated to this instance, disassociate it
+                    result = eip.disassociate()
+
                 if result:
                     print "{0} has been disassociated".format(eip)
                 else:
@@ -108,3 +103,13 @@ class EIP:
     def uninstall(self):
         # TODO uninstall initd
         return False
+
+
+if __name__ == '__main__':
+    config = Config.fromAmazon()
+    eip = EIP(config)
+    action = sys.argv[2]
+    if action == "start":
+        eip.associate()
+    elif action == "stop":
+        eip.disassociate()

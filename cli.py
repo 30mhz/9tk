@@ -33,7 +33,7 @@ class ToolKit(cmd.Cmd):
         return completions
 
     def do_eip(self, cmd):
-        eip = EIP.fromAmazon(self.CONFIG)
+        eip = EIP(self.CONFIG)
         if cmd == self.EIP_COMMANDS[0]:
             eip.associate()
         elif cmd == self.EIP_COMMANDS[1]:
