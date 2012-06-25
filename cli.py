@@ -4,16 +4,18 @@ from tools.config import Config
 from tools.eip import EIP
 
 class ToolKit(cmd.Cmd):
-    """Simple command processor example."""
+
+    CONFIG = Config.fromAmazon()
+
+    ##########################################################################################
 
     def help_display(self):
         print '\n'.join(["display", " Display user-data associated with this EC2 instance"])
 
     def do_display(self, line):
-        config = Config.fromAmazon()
-        print config
+        print self.CONFIG
 
-    ###############
+    ##########################################################################################
 
     EIP_COMMANDS = ["associate", "disassociate", "install", "uninstall"]
 
@@ -31,18 +33,13 @@ class ToolKit(cmd.Cmd):
         return completions
 
     def do_eip(self, cmd):
-        try:
-            config = Config.fromAmazon()
-            eip = EIP.fromAmazon(config)
-            if cmd == self.EIP_COMMANDS[0]:
-                eip.associate()
-            elif cmd == self.EIP_COMMANDS[1]:
-                eip.disassociate()
-        except Exception as e:
-            print("ERROR - EIP couldn't {0}".format(cmd))
-            print e
+        eip = EIP.fromAmazon(self.CONFIG)
+        if cmd == self.EIP_COMMANDS[0]:
+            eip.associate()
+        elif cmd == self.EIP_COMMANDS[1]:
+            eip.disassociate()
 
-    ###############
+    ##########################################################################################
 
     # eip associate, dissociate, install, uninstall
     # backup setup (or install)

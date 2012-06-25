@@ -21,7 +21,7 @@ class Config:
         """Load user-data from aws"""
         try:
             url = "http://169.254.169.254/latest/"
-            data = json.load(urlopen(url + "user-data/"))
+            data = json.load(urlopen(url + "user-data/", timeout=3))
             return cls(data)
         except Exception as e:
             print e

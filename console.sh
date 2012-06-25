@@ -40,4 +40,6 @@ do
     fi
 done
 
+echo ""
+
 python ./cli.py

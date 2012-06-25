@@ -1,6 +1,4 @@
 {
-    "access_key_id" : "",
-    "secret_access_key" : "",
     "backups" : {
       "domain" : "snapshots.9apps.net",
       "schedule" : ["hourly", "daily", "weekly", "monthly"],
@@ -11,7 +9,7 @@
       "monthly" : "@monthly"
     }
     "eip" : {
-      "ip" : "127.0.0.1"
+      "ip" : "79.125.12.116"
     }
     "mountpoints" : {
       "/dev/xsdf" : "/var/www"

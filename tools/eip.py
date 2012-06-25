@@ -39,17 +39,13 @@ class EIP:
             region = urlopen(url + "meta-data/placement/availability-zone").read()[:-1]
             endpoint = "ec2.{0}.amazonaws.com".format(region)
             region_info = RegionInfo(name=region, endpoint=endpoint)
+            print "Instance: {0} in Region: {1}".format(instanceId, region_info.endpoint)
 
-            # TODO we use IAM EC2 role to get the credentials transparently
-
-            key = config.data['access_key_id']
-            access = config.data['secret_access_key']
+            # we use IAM EC2 role to get the credentials transparently
+            ec2 = EC2Connection(region=region_info)
             ip = config.data['eip']['ip']
-            print "key: '{0}', access: '{1}', ip: '{2}', region: '{3}'".format(key, access, ip, region_info.endpoint)
-            ec2 = EC2Connection(key, access, region=region_info)
-            #eip = ec2.get_all_addresses(ip)[0]
-            eip = ec2.get_all_addresses()[0]
-            print "address: {0}".format(eip)
+            eip = ec2.get_all_addresses([ip])[0]
+            print "Elastic IP: {0}".format(eip)
             return cls(instanceId, eip)
         except Exception as e:
             print("ERROR - We couldn't get instance information: {0}".format(e))
@@ -57,34 +53,58 @@ class EIP:
             print traceback.format_exc()
 
 
-
     def associate(self):
         result = False
         eip = self.eip
-        if eip.instance_id == "":
-            result = eip.associate(self.instanceId)
-            if result:
-                print "EIP {0} is now associated to instance {1}".format(eip, self.instanceId)
+        instanceId = self.instanceId
+        try:
+            if eip.instance_id == "":
+                result = eip.associate(instanceId)
+                if result:
+                    print "{0} is now associated to instance {1}".format(eip, instanceId)
+                else:
+                    print "ERROR - Problem while associating {0} to instance {1}".format(eip, instanceId)
             else:
-                print "ERROR - There was a problem while associating EIP {0} to instance {1}".format(eip, self.instanceId)
-        else:
-            # if the elastic IP is already taken, then don't do anything
-            print "WARN - EIP {0} is already in use by instance {1}".format(eip, eip.instance_id)
+                # if the elastic IP is already taken, then don't do anything
+                print "WARN - {0} is already in use by instance {1}".format(eip, eip.instance_id)
+        except Exception as e:
+            print("ERROR - We couldn't associate {0} to this instance {1}: {2}".format(eip, instanceId, e))
+        finally:
+            print traceback.format_exc()
         return result
+
 
     def disassociate(self):
         result = False
         eip = self.eip
+        instanceId = self.instanceId
         associated_instance_id = eip.instance_id
-        if associated_instance_id == "":
-            print "EIP is already free, doing nothing"
-        elif associated_instance_id != self.instanceId:
-            print "WARN - EIP {0} is associated to another instance {1} - doing nothing".format(eip, associated_instance_id)
-        else:
-            # the EIP is associated to this instance, disassociate it
-            result = eip.disassociate()
-            if result:
-                print "EIP {0} has been disassociated".format(eip)
+        try:
+            if associated_instance_id == "":
+                print "{0} is already free, doing nothing".format(eip)
+            elif associated_instance_id != instanceId:
+                print "WARN - {0} is associated to another instance {1} - doing nothing".format(eip,
+                    associated_instance_id)
             else:
-                print "ERROR - There was a problem while dissociating EIP {0} to instance {1}".format(eip, self.instanceId)
+                # the EIP is associated to this instance, disassociate it
+                result = eip.disassociate()
+                if result:
+                    print "{0} has been disassociated".format(eip)
+                else:
+                    print "ERROR - There was a problem while dissociating EIP {0} to instance {1}".format(eip,
+                        instanceId)
+        except Exception as e:
+            print("ERROR - We couldn't disassociate {0} to this instance {1}: {2}".format(eip, instanceId, e))
+        finally:
+            print traceback.format_exc()
         return result
+
+
+    def install(self):
+        # TODO install initd
+        return False
+
+
+    def uninstall(self):
+        # TODO uninstall initd
+        return False
