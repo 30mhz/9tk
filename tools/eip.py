@@ -34,7 +34,6 @@ class EIP:
             self.eip = eip
         except Exception as e:
             print("ERROR - Problem retrieving the desired EIP: {0}".format(e))
-        finally:
             print traceback.format_exc()
 
 
@@ -59,7 +58,6 @@ class EIP:
                 print "WARN - {0} is already in use by instance {1}".format(eip, eip.instance_id)
         except Exception as e:
             print("ERROR - We couldn't associate {0} to this instance {1}: {2}".format(eip, instanceId, e))
-        finally:
             print traceback.format_exc()
         return result
 
@@ -90,7 +88,6 @@ class EIP:
                         instanceId)
         except Exception as e:
             print("ERROR - We couldn't disassociate {0} to this instance {1}: {2}".format(eip, instanceId, e))
-        finally:
             print traceback.format_exc()
         return result
 
@@ -108,7 +105,7 @@ class EIP:
 if __name__ == '__main__':
     config = Config.fromAmazon()
     eip = EIP(config)
-    action = sys.argv[2]
+    action = sys.argv[1]
     if action == "start":
         eip.associate()
     elif action == "stop":

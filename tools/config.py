@@ -40,5 +40,4 @@ class Config:
             return cls(instanceId, regionInfo, userData)
         except Exception as e:
             print("ERROR - Problem retrieving instance user-data or meta-data: {0}".format(e))
-        finally:
             print traceback.format_exc()
