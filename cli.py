@@ -2,6 +2,7 @@ import cmd
 
 from tools.config import Config
 from tools.eip import EIP
+from tools.backup import Backup
 
 class ToolKit(cmd.Cmd):
 
@@ -10,7 +11,7 @@ class ToolKit(cmd.Cmd):
     ##########################################################################################
 
     def help_display(self):
-        print '\n'.join(["display", " Display user-data associated with this EC2 instance"])
+        print "\n".join(["display", "Display user-data associated with this EC2 instance"])
 
     def do_display(self, line):
         print self.CONFIG
@@ -20,7 +21,7 @@ class ToolKit(cmd.Cmd):
     EIP_COMMANDS = ["associate", "disassociate", "install", "uninstall"]
 
     def help_eip(self):
-        print '\n'.join(["eip {0}".format(self.EIP_COMMANDS), " Associate or disassociate EIP configured in user-data"])
+        print "\n".join(["eip {0}".format(self.EIP_COMMANDS), "Associate or disassociate EIP configured in user-data"])
 
     def complete_eip(self, text, line, begidx, endidx):
         if not text:
@@ -45,17 +46,25 @@ class ToolKit(cmd.Cmd):
 
     ##########################################################################################
 
-    # eip associate, dissociate, install, uninstall
-    # backup setup (or install)
+    def help_backup(self):
+        print "\n".join(["backup", "Setup backup as configured in user-data"])
+
+    def do_backup(self, line):
+        backup = Backup(self.CONFIG)
+        backup.setup()
+
+    ##########################################################################################
+
+
     # mount -, install, uninstall
     # umount
 
 
-
+    ##########################################################################################
 
     def do_EOF(self, line):
         print "Exit"
         return True
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     ToolKit().cmdloop("\nWelcome to the 9apps ToolKit CLI.\n")

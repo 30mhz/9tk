@@ -15,9 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with 9apps ToolKit. If not, see <http://www.gnu.org/licenses/>.
 
-import traceback
-import sys
-import pystache
+import traceback, sys, pystache
 
 from boto.ec2.connection import EC2Connection
 from config import Config
@@ -28,9 +26,9 @@ class EIP:
         self.config = config
         try:
             # we use IAM EC2 role to get the credentials transparently
-            ec2 = EC2Connection(region=config.regionInfo)
+            self.ec2 = EC2Connection(region=config.regionInfo)
             ip = config.userData['eip']['ip']
-            eip = ec2.get_all_addresses([ip])[0]
+            eip = self.ec2.get_all_addresses([ip])[0]
             print "Elastic IP: {0}".format(eip)
 
             self.eip = eip
@@ -149,8 +147,4 @@ class EIP:
 if __name__ == '__main__':
     config = Config.fromAmazon()
     eip = EIP(config)
-    action = sys.argv[1]
-    if action == "associate":
-        eip.associate()
-    elif action == "disassociate":
-        eip.disassociate()
+    getattr(eip, sys.argv[1])

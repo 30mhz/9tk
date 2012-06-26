@@ -23,7 +23,7 @@ echo ""
 echo "Checking python libraries ..."
 
 declare -a LIBS
-LIBS=("virtualenv" "boto" "pystache" "mock")
+LIBS=("virtualenv" "boto" "pystache")
 
 TMP_LIST="/tmp/python_lib_installed"
 $(pip freeze >> ${TMP_LIST})
