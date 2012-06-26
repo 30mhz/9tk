@@ -56,28 +56,28 @@ class Backup:
             f.write("# generated with 'python backup.py setup'\n")
 
             backupConfig = self.config.userData["backups"]
-            if backupConfig["schedule"]["hourly"]:
+            if "hourly" in backupConfig["schedule"]:
                 if 'hourly' not in backupConfig:
                     hourly = "0 * * * *"
                 else:
                     hourly = backupConfig['hourly']
                 f.write("{0} root {1} all hourly > /dev/null 2>&1\n".format(hourly, cmd))
 
-            if backupConfig["schedule"]["daily"]:
+            if "daily" in backupConfig["schedule"]:
                 if 'daily' not in backupConfig:
                     daily = "0 0 * * *"
                 else:
                     daily = backupConfig['daily']
                 f.write("{0} root {1} all daily > /dev/null 2>&1\n".format(daily, cmd))
 
-            if backupConfig["schedule"]["weekly"]:
+            if "weekly" in backupConfig["schedule"]:
                 if 'weekly' not in backupConfig:
                     weekly = "0 0 * * 0"
                 else:
                     weekly = backupConfig['weekly']
                 f.write("{0} root {1} all weekly > /dev/null 2>&1\n".format(weekly, cmd))
 
-            if backupConfig["schedule"]["monthly"]:
+            if "monthly" in backupConfig["schedule"]:
                 if 'monthly' not in backupConfig:
                     monthly = "0 0 1 * *"
                 else:
