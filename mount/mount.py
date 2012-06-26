@@ -63,6 +63,9 @@ class Mountpoint:
 
     def mount(self):
         """Mount the device to a specific location"""
+
+        # TODO attach volume
+
         d = self.device
         mp = self.mountpoint
         print("Mounting {0} @ {1} ...".format(d, mp))
@@ -84,6 +87,9 @@ class Mountpoint:
         print("Umounting {0} ...".format(mp))
 
         Popen(["umount", "-t", "xfs", mp], stdout=subprocess.PIPE).wait()
+
+        # TODO detach volume
+
 
 
 

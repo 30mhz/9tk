@@ -1,0 +1,52 @@
+#!/bin/bash
+
+### BEGIN INIT INFO
+# Provides:          {{provides}}
+# Required-Start:    $network $local_fs
+# Required-Stop:     $apache2
+# Should-Start:      $named
+# Should-Stop:
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: {{short_description}}
+# Description:       {{description}}
+### END INIT INFO
+
+prog=$(basename $0)
+logger="logger -t $prog"
+
+# Wait until networking is up on the EC2 instance
+perl -MIO::Socket::INET -e '
+until(new IO::Socket::INET("169.254.169.254:80")){print"Waiting for network...\n";sleep 1}
+' | $logger
+
+PYTHON=/usr/bin/python
+SCRIPT_DIR=/root/9tk/tools
+
+start() {
+  $PYTHON $SCRIPT_DIR/{{py_script}} {{start_args}}
+}
+
+stop() {
+  $PYTHON $SCRIPT_DIR/{{py_script}} {{stop_args}}
+}
+
+case "$1" in
+    start)
+        start
+        ;;
+    stop)
+        stop
+        ;;
+    restart)
+        stop
+        sleep 5
+        start
+        ;;
+    *)
+        echo "Usage: $SELF {start|stop|restart}"
+        exit 1
+        ;;
+esac
+
+exit 0

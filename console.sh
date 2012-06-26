@@ -16,8 +16,6 @@ do
     if [ "${EXISTS}" == "" ]; then
         echo "${PKG} is not installed"
         apt-get --yes install ${PKG}
-    else
-        echo "${PKG} is installed"
     fi
 done
 
@@ -25,7 +23,7 @@ echo ""
 echo "Checking python libraries ..."
 
 declare -a LIBS
-LIBS=("virtualenv" "boto" "mock")
+LIBS=("virtualenv" "boto" "pystache" "mock")
 
 TMP_LIST="/tmp/python_lib_installed"
 $(pip freeze >> ${TMP_LIST})
@@ -35,8 +33,6 @@ do
     if [ "${EXISTS}" == "" ]; then
         echo "${LIB} is not installed"
         pip install --upgrade ${LIB}
-    else
-        echo "${LIB} is installed"
     fi
 done
 

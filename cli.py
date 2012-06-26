@@ -38,6 +38,10 @@ class ToolKit(cmd.Cmd):
             eip.associate()
         elif cmd == self.EIP_COMMANDS[1]:
             eip.disassociate()
+        elif cmd == self.EIP_COMMANDS[2]:
+            eip.install_initd()
+        elif cmd == self.EIP_COMMANDS[3]:
+            eip.uninstall()
 
     ##########################################################################################
 

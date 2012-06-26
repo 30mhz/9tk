@@ -17,9 +17,11 @@
 
 import traceback
 import sys
+import pystache
 
 from boto.ec2.connection import EC2Connection
 from config import Config
+from bashcmd import BashCmd
 
 class EIP:
     def __init__(self, config):
@@ -39,11 +41,13 @@ class EIP:
 
     def associate(self):
         result = False
-        eip = self.eip
-        instanceId = self.config.instanceId
+        eip = ""
+        instanceId = ""
         try:
+            eip = self.eip
+            instanceId = self.config.instanceId
             if eip.instance_id == "":
-                # TODO
+                # TODO see config.py
                 if self.config.NOOP:
                     result = True
                 else:
@@ -64,17 +68,19 @@ class EIP:
 
     def disassociate(self):
         result = False
-        eip = self.eip
-        instanceId = self.config.instanceId
-        associated_instance_id = eip.instance_id
+        eip = ""
+        instanceId = ""
         try:
+            eip = self.eip
+            instanceId = self.config.instanceId
+            associated_instance_id = eip.instance_id
             if associated_instance_id == "":
                 print "{0} is already free, doing nothing".format(eip)
             elif associated_instance_id != instanceId:
                 print "WARN - {0} is associated to another instance {1} - doing nothing".format(eip,
                     associated_instance_id)
             else:
-                # TODO
+                # TODO see config.py
                 if self.config.NOOP:
                     result = True
                 else:
@@ -91,10 +97,39 @@ class EIP:
             print traceback.format_exc()
         return result
 
+    INITD_TEMPLATE = "templates/initd.mustache"
 
-    def install(self):
-        # TODO install initd
-        return False
+    def install_initd(self):
+        result = False
+        #render initd template
+        renderArgs = {
+            "provides" : "EC2 Elastic IP provisioning",
+            "short_description" : "EIP housekeeping",
+            "description" : "Associate and disassociate EIP to/from this instance",
+            "py_script" : "eip.py",
+            "start_args" : "associate",
+            "stop_args" : "disassociate"
+        }
+        initd = pystache.render(open(self.INITD_TEMPLATE, "r").read(), renderArgs)
+
+        # write initd file
+        initdFile = "/etc/init.d/eip"
+        open(initdFile, "w").write(initd)
+
+        # change permission and update-rc.d
+        chmod = BashCmd(["/bin/chmod", "700", initdFile])
+        chmod.execute()
+        if chmod.isOk():
+            updaterc = BashCmd(["/usr/sbin/update-rc.d", initdFile, "defaults"])
+            updaterc.execute()
+            if updaterc.isOk():
+                result = True
+                print "{0} installed correctly".format(initdFile)
+            else:
+                print "ERROR - Problem installing {0} {1}".format(initdFile, updaterc)
+        else:
+            print "ERROR - Problem setting permission on {0} {1}".format(initdFile, chmod)
+        return result
 
 
     def uninstall(self):
@@ -106,7 +141,7 @@ if __name__ == '__main__':
     config = Config.fromAmazon()
     eip = EIP(config)
     action = sys.argv[1]
-    if action == "start":
+    if action == "associate":
         eip.associate()
-    elif action == "stop":
+    elif action == "disassociate":
         eip.disassociate()
