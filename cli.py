@@ -66,5 +66,8 @@ class ToolKit(cmd.Cmd):
         print "Exit"
         return True
 
+    def emptyline(self):
+        return ""
+
 if __name__ == "__main__":
     ToolKit().cmdloop("\nWelcome to the 9apps ToolKit CLI.\n")

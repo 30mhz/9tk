@@ -28,12 +28,12 @@ class Config:
         try:
             url = "http://169.254.169.254/latest/"
 
-            instanceId = urlopen(url + "meta-data/instance-id", timeout=3).read()
-            region = urlopen(url + "meta-data/placement/availability-zone", timeout=3).read()[:-1]
+            instanceId = urlopen(url + "meta-data/instance-id", timeout=1).read()
+            region = urlopen(url + "meta-data/placement/availability-zone", timeout=1).read()[:-1]
             endpoint = "ec2.{0}.amazonaws.com".format(region)
             regionInfo = RegionInfo(name=region, endpoint=endpoint)
 
-            userData = json.load(urlopen(url + "user-data/", timeout=3))
+            userData = json.load(urlopen(url + "user-data/", timeout=1))
 
             return cls(instanceId, regionInfo, userData)
         except Exception as e:

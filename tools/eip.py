@@ -89,9 +89,9 @@ class EIP:
 
     INITD_TEMPLATE = "templates/initd.mustache"
 
-    initdPath = "/etc/init.d/"
-    initdName = "eip"
-    initdFile = initdPath + initdName
+    INITD_PATH = "/etc/init.d/"
+    INITD_NAME = "eip"
+    INITD_FILE = INITD_PATH + INITD_NAME
 
 
     def install_initd(self):
@@ -108,39 +108,39 @@ class EIP:
         initdContent = pystache.render(open(self.INITD_TEMPLATE, "r").read(), renderArgs)
 
         # write initd file
-        open(self.initdFile, "w").write(initdContent)
+        open(self.INITD_FILE, "w").write(initdContent)
 
         # change permission and update-rc.d
-        chmod = BashCmd(["/bin/chmod", "700", self.initdFile])
+        chmod = BashCmd(["/bin/chmod", "700", self.INITD_FILE])
         chmod.execute()
         if chmod.isOk():
-            updaterc = BashCmd(["/usr/sbin/update-rc.d", self.initdName, "defaults"])
+            updaterc = BashCmd(["/usr/sbin/update-rc.d", self.INITD_NAME, "defaults"])
             updaterc.execute()
             if updaterc.isOk():
                 result = True
-                print "{0} installed correctly".format(self.initdFile)
+                print "{0} installed correctly".format(self.INITD_FILE)
             else:
-                print "ERROR - Problem installing {0}, {1}".format(self.initdFile, updaterc)
+                print "ERROR - Problem installing {0}, {1}".format(self.INITD_FILE, updaterc)
         else:
-            print "ERROR - Problem setting permission on {0}, {1}".format(self.initdFile, chmod)
+            print "ERROR - Problem setting permission on {0}, {1}".format(self.INITD_FILE, chmod)
         return result
 
 
     def uninstall(self):
         result = False
         # remove initd file and update-rc.d
-        rm = BashCmd(["/bin/rm", self.initdFile])
+        rm = BashCmd(["/bin/rm", self.INITD_FILE])
         rm.execute()
         if rm.isOk():
-            updaterc = BashCmd(["/usr/sbin/update-rc.d", self.initdName, "remove"])
+            updaterc = BashCmd(["/usr/sbin/update-rc.d", self.INITD_NAME, "remove"])
             updaterc.execute()
             if updaterc.isOk():
                 result = True
-                print "{0} uninstalled correctly".format(self.initdFile)
+                print "{0} uninstalled correctly".format(self.INITD_FILE)
             else:
-                print "ERROR - Problem uninstalling {0}, {1}".format(self.initdFile, updaterc)
+                print "ERROR - Problem uninstalling {0}, {1}".format(self.INITD_FILE, updaterc)
         else:
-            print "ERROR - Problem deleting {0}, {1}".format(self.initdFile, rm)
+            print "ERROR - Problem deleting {0}, {1}".format(self.INITD_FILE, rm)
         return result
 
 
