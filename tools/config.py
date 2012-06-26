@@ -12,8 +12,6 @@ class Config:
         self.instanceId = instanceId
         self.regionInfo = regionInfo
         self.userData = userData
-        ### TODO used only for local testing, it doesnt invoke aws api
-        self.NOOP = True
 
     def __repr__(self):
         return "InstanceId: {0}\n{1}\nUserData: {2}".format(self.instanceId, self.regionInfo, json.dumps(self.userData, indent=4))

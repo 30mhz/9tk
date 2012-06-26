@@ -47,11 +47,7 @@ class EIP:
             eip = self.eip
             instanceId = self.config.instanceId
             if eip.instance_id == "":
-                # TODO see config.py
-                if self.config.NOOP:
-                    result = True
-                else:
-                    result = eip.associate(instanceId)
+                result = eip.associate(instanceId)
 
                 if result:
                     print "{0} is now associated to instance {1}".format(eip, instanceId)
@@ -80,12 +76,8 @@ class EIP:
                 print "WARN - {0} is associated to another instance {1} - doing nothing".format(eip,
                     associated_instance_id)
             else:
-                # TODO see config.py
-                if self.config.NOOP:
-                    result = True
-                else:
-                    # the EIP is associated to this instance, disassociate it
-                    result = eip.disassociate()
+                # the EIP is associated to this instance, disassociate it
+                result = eip.disassociate()
 
                 if result:
                     print "{0} has been disassociated".format(eip)
@@ -99,6 +91,11 @@ class EIP:
 
     INITD_TEMPLATE = "templates/initd.mustache"
 
+    initdPath = "/etc/init.d/"
+    initdName = "eip"
+    initdFile = initdPath + initdName
+
+
     def install_initd(self):
         result = False
         #render initd template
@@ -110,31 +107,43 @@ class EIP:
             "start_args" : "associate",
             "stop_args" : "disassociate"
         }
-        initd = pystache.render(open(self.INITD_TEMPLATE, "r").read(), renderArgs)
+        initdContent = pystache.render(open(self.INITD_TEMPLATE, "r").read(), renderArgs)
 
         # write initd file
-        initdFile = "/etc/init.d/eip"
-        open(initdFile, "w").write(initd)
+        open(self.initdFile, "w").write(initdContent)
 
         # change permission and update-rc.d
-        chmod = BashCmd(["/bin/chmod", "700", initdFile])
+        chmod = BashCmd(["/bin/chmod", "700", self.initdFile])
         chmod.execute()
         if chmod.isOk():
-            updaterc = BashCmd(["/usr/sbin/update-rc.d", initdFile, "defaults"])
+            updaterc = BashCmd(["/usr/sbin/update-rc.d", self.initdName, "defaults"])
             updaterc.execute()
             if updaterc.isOk():
                 result = True
-                print "{0} installed correctly".format(initdFile)
+                print "{0} installed correctly".format(self.initdFile)
             else:
-                print "ERROR - Problem installing {0} {1}".format(initdFile, updaterc)
+                print "ERROR - Problem installing {0}, {1}".format(self.initdFile, updaterc)
         else:
-            print "ERROR - Problem setting permission on {0} {1}".format(initdFile, chmod)
+            print "ERROR - Problem setting permission on {0}, {1}".format(self.initdFile, chmod)
         return result
 
 
     def uninstall(self):
-        # TODO uninstall initd
-        return False
+        result = False
+        # remove initd file and update-rc.d
+        rm = BashCmd(["/bin/rm", self.initdFile])
+        rm.execute()
+        if rm.isOk():
+            updaterc = BashCmd(["/usr/sbin/update-rc.d", self.initdName, "remove"])
+            updaterc.execute()
+            if updaterc.isOk():
+                result = True
+                print "{0} uninstalled correctly".format(self.initdFile)
+            else:
+                print "ERROR - Problem uninstalling {0}, {1}".format(self.initdFile, updaterc)
+        else:
+            print "ERROR - Problem deleting {0}, {1}".format(self.initdFile, rm)
+        return result
 
 
 if __name__ == '__main__':

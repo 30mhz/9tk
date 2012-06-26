@@ -21,10 +21,10 @@ class BashCmd:
             print traceback.format_exc()
 
     def __repr__(self):
-        return "\nReturn code: {1}\nOutput: {2}".format(self.returnCode, self.output)
+        return "\nReturn code: {0}\nOutput: {1}".format(self.returnCode, self.output)
 
     def isOk(self):
-        if self.returnCode:
-            return True if self.returnCode == 0 else False
+        if self.returnCode == 0:
+            return True
         else:
             return False
