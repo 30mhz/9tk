@@ -1,5 +1,0 @@
-Add script eip.py to /root
-Add script eip_init.sh (in github) to /etc/init.d and change EIP accordingly.
-
-$ chmod 700 /etc/init.d/eip_init.sh
-$ update-rc.d ec2 defaults
