@@ -15,11 +15,12 @@
 # You should have received a copy of the GNU General Public License
 # along with 9apps ToolKit. If not, see <http://www.gnu.org/licenses/>.
 
-import traceback, sys, pystache
+import traceback, sys
 
 from boto.ec2.connection import EC2Connection
+
 from config import Config
-from bashcmd import BashCmd
+from util.initd import Initd
 
 class EIP:
     def __init__(self, config):
@@ -87,16 +88,9 @@ class EIP:
             print traceback.format_exc()
         return result
 
-    INITD_TEMPLATE = "templates/initd.mustache"
-
-    INITD_PATH = "/etc/init.d/"
     INITD_NAME = "eip"
-    INITD_FILE = INITD_PATH + INITD_NAME
-
 
     def install_initd(self):
-        result = False
-        #render initd template
         renderArgs = {
             "provides" : "EC2 Elastic IP provisioning",
             "short_description" : "EIP housekeeping",
@@ -105,43 +99,13 @@ class EIP:
             "start_args" : "associate",
             "stop_args" : "disassociate"
         }
-        initdContent = pystache.render(open(self.INITD_TEMPLATE, "r").read(), renderArgs)
-
-        # write initd file
-        open(self.INITD_FILE, "w").write(initdContent)
-
-        # change permission and update-rc.d
-        chmod = BashCmd(["/bin/chmod", "700", self.INITD_FILE])
-        chmod.execute()
-        if chmod.isOk():
-            updaterc = BashCmd(["/usr/sbin/update-rc.d", self.INITD_NAME, "defaults"])
-            updaterc.execute()
-            if updaterc.isOk():
-                result = True
-                print "{0} installed correctly".format(self.INITD_FILE)
-            else:
-                print "ERROR - Problem installing {0}, {1}".format(self.INITD_FILE, updaterc)
-        else:
-            print "ERROR - Problem setting permission on {0}, {1}".format(self.INITD_FILE, chmod)
-        return result
+        initd = Initd(self.INITD_NAME)
+        return initd.install(renderArgs)
 
 
     def uninstall(self):
-        result = False
-        # remove initd file and update-rc.d
-        rm = BashCmd(["/bin/rm", self.INITD_FILE])
-        rm.execute()
-        if rm.isOk():
-            updaterc = BashCmd(["/usr/sbin/update-rc.d", self.INITD_NAME, "remove"])
-            updaterc.execute()
-            if updaterc.isOk():
-                result = True
-                print "{0} uninstalled correctly".format(self.INITD_FILE)
-            else:
-                print "ERROR - Problem uninstalling {0}, {1}".format(self.INITD_FILE, updaterc)
-        else:
-            print "ERROR - Problem deleting {0}, {1}".format(self.INITD_FILE, rm)
-        return result
+        initd = Initd(self.INITD_NAME)
+        return initd.uninstall()
 
 
 if __name__ == '__main__':
