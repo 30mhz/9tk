@@ -14,14 +14,13 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with 9apps ToolKit. If not, see <http://www.gnu.org/licenses/>.
-
-import pystache
+import os, pystache
 
 from bashcmd import BashCmd
 
 class Initd:
 
-    INITD_TEMPLATE = "./initd.mustache"
+    INITD_TEMPLATE = os.path.join(os.path.dirname(__file__), "initd.mustache")
     INITD_DIR = "/etc/init.d/"
 
     def __init__(self, name):
@@ -71,3 +70,6 @@ class Initd:
         else:
             print "ERROR - Problem deleting {0}, {1}".format(self.path, rm)
         return result
+
+if __name__ == '__main__':
+    print os.path.join(os.path.dirname(__file__), "initd.mustache")
