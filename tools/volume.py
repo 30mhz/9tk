@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with 9apps ToolKit. If not, see <http://www.gnu.org/licenses/>.
 
-import sys, traceback, os.path
+import sys, traceback, time
 
 from boto.ec2.connection import EC2Connection
 
@@ -48,6 +48,12 @@ class Volume:
             if volume.status == "available":
                 print "Attaching volume to device {0} ...".format(device)
                 self.ec2.attach_volume(volume.id, self.config.instanceId, device)
+                #wait untill the volume is attached
+                volume.update()
+                while volume.attachment_state() != "attached":
+                    time.sleep(3)
+                    volume.update()
+                    print "volume status: {0}".format(volume.attachment_state())
 
             #HACK to make it work on Ubuntu 12.04
             dev = device.replace("/dev/s", "/dev/xv")
