@@ -95,7 +95,7 @@ class Volume:
 
     INITD_NAME = "volume"
 
-    def install_initd(self):
+    def install(self):
         renderArgs = {
             "provides" : "EC2 Volume provisioning",
             "short_description" : "Volume housekeeping",

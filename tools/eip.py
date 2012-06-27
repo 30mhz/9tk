@@ -90,7 +90,7 @@ class EIP:
 
     INITD_NAME = "eip"
 
-    def install_initd(self):
+    def install(self):
         renderArgs = {
             "provides" : "EC2 Elastic IP provisioning",
             "short_description" : "EIP housekeeping",
