@@ -15,7 +15,8 @@
     },
     "volumes" : {
         "vol-2547dd4d" : {
-            "/dev/xsdf" : "/var/www"
+            "device" : "/dev/sdh",
+            "mountpoint" : "/var/www"
         }
     }
 }

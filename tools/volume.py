@@ -15,11 +15,12 @@
 # You should have received a copy of the GNU General Public License
 # along with 9apps ToolKit. If not, see <http://www.gnu.org/licenses/>.
 
-import sys, traceback
+import sys, traceback, os.path
 
 from boto.ec2.connection import EC2Connection
 
 from config import Config
+from util.bashcmd import BashCmd
 from util.initd import Initd
 
 class Volume:
@@ -35,24 +36,55 @@ class Volume:
 
     def mount(self):
         #loop through the volumes
-        for volumeId in self.config["volumes"]:
+        volumes = self.config.userData["volumes"]
+        for volumeId in volumes:
             volume = self.ec2.get_all_volumes([volumeId])[0]
             print "Volume {0} status: {1}".format(volume.id, volume.status)
 
-        # attach the volume to the instance in case and wait till is done
-        # mount the volume to the mountpoint
+            device = volumes[volumeId]["device"]
+            mountpoint = volumes[volumeId]["mountpoint"]
 
-        #print("Mounting {0} @ {1} ...".format(d, mp))
-        #["mkdir", mp]
-        #["mount", "-t", "xfs", "-o", "defaults", d, mp]
+            # attach the volume to the instance in case is not in use
+            if volume.status == "available":
+                print "Attaching volume to device {0} ...".format(device)
+                self.ec2.attach_volume(volume.id, self.config.instanceId, device)
 
-    #def umount(self):
+            #HACK to make it work on Ubuntu 12.04
+            dev = device.replace("/dev/s", "/dev/xv")
+
+            # mount the volume to the mountpoint
+            print "Mounting {0} @ {1} ...".format(dev, mountpoint)
+            BashCmd([ "mkdir", "-p", mountpoint ]).execute()
+            mount = BashCmd([ "mount", "-t", "xfs", "-o", "defaults", dev, mountpoint ])
+            mount.execute()
+            if mount.isOk():
+                print "Mountpoint {0} ready".format(mountpoint)
+            else:
+                print "ERROR - Problem mounting {0}".format(mountpoint)
+
+
+    def umount(self):
         #loop through the volumes
-        # umount the volume from the mountpoint
-        # detach the volume from the instance in case and wait till is done
+        volumes = self.config.userData["volumes"]
+        for volumeId in volumes:
+            volume = self.ec2.get_all_volumes([volumeId])[0]
+            print "Volume {0} status: {1}".format(volume.id, volume.status)
 
-        #print("Umounting {0} ...".format(mp))
-        #["umount", "-t", "xfs", mp]
+            device = volumes[volumeId]["device"]
+            mountpoint = volumes[volumeId]["mountpoint"]
+
+            # umount the volume and detach the volume if is in use
+            print("Umounting {0} ...".format(mountpoint))
+            umount = BashCmd( ["umount", "-t", "xfs", mountpoint] )
+            umount.execute()
+            if umount.isOk():
+                if volume.status == "in-use":
+                    print "Detaching volume {0} ...".format(volume.id)
+                    self.ec2.detach_volume(volume.id, self.config.instanceId, device)
+                else:
+                    print "Volume {0} already detached".format(volume.id)
+            else:
+                print "ERROR - Problem umounting {0}".format(mountpoint)
 
 
     INITD_NAME = "volume"
@@ -74,7 +106,8 @@ class Volume:
         initd = Initd(self.INITD_NAME)
         return initd.uninstall()
 
+
 if __name__ == '__main__':
     config = Config.fromAmazon()
     backup = Volume(config)
-    getattr(backup, sys.argv[1])
+    getattr(backup, sys.argv[1])()

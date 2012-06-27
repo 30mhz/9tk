@@ -111,4 +111,4 @@ class EIP:
 if __name__ == '__main__':
     config = Config.fromAmazon()
     eip = EIP(config)
-    getattr(eip, sys.argv[1])
+    getattr(eip, sys.argv[1])()

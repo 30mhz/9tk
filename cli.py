@@ -54,7 +54,7 @@ class ToolKit(cmd.Cmd):
 
     def do_eip(self, cmd):
         eip = EIP(self.CONFIG)
-        getattr(eip, cmd)
+        getattr(eip, cmd)()
 
     ##########################################################################################
 
@@ -85,7 +85,7 @@ class ToolKit(cmd.Cmd):
 
     def do_volume(self, cmd):
         volume = Volume(self.CONFIG)
-        getattr(volume, cmd)
+        getattr(volume, cmd)()
 
     ##########################################################################################
 
