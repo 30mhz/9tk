@@ -43,7 +43,7 @@ class Backup:
 
     def setup(self):
         """Setup cron for the user executing this script"""
-        cmd = "{0} {1}".format(sys.executable, os.path.abspath(__file__))
+        cmd = "{0} {1}".format(sys.executable, os.path.abspath(__file__).rstrip("c"))
 
         cronFile = "/etc/cron.d/9apps-backup"
         f = None
